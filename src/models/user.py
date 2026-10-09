@@ -1,6 +1,6 @@
 import re
-from main import ENABLE_DEBUG_LOGGING
-from project import Project
+from src.globals import ENABLE_DEBUG_LOGGING
+from src.models.project import Project
 from src.utils.logger import DualLogger
 
 

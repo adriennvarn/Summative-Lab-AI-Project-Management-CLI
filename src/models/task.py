@@ -1,6 +1,5 @@
 from src.utils.logger import DualLogger
-from main import ENABLE_DEBUG_LOGGING
-from user import User
+from src.globals import ENABLE_DEBUG_LOGGING
 
 
 class Task:
@@ -55,22 +54,15 @@ class Task:
 
     @assigned_to.setter
     def assigned_to(self, value):
-        """Assigns task based on User.
+        """Assigns task to a name.
         Raises:
-            TypeError: if value is not of type User."""
+            ValueError: if no value is passed in."""
         if not value:
-            self.logger.error(
+            self.logger.warn(
                 f"Failed to assign user to {self.title}: Passed no value."
             )
-            raise TypeError(
+            raise ValueError(
                 f"Failed to assign user to {self.title}: No value was passed in."
-            )
-        if not isinstance(value, User):
-            self.logger.error(
-                f"Failed to assign user to {self.title}: not a valid User object."
-            )
-            raise TypeError(
-                f"Failed to assign user to {self.title}: not a valid User object."
             )
 
     def update_task(self, title, status, assigned_to):

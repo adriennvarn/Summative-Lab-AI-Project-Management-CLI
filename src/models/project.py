@@ -1,7 +1,6 @@
 from src.utils.logger import DualLogger
-from main import ENABLE_DEBUG_LOGGING
-from task import Task
-from rich import print
+from src.globals import ENABLE_DEBUG_LOGGING
+from src.models.task import Task
 
 
 class Project:
