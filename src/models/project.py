@@ -2,6 +2,7 @@ from src.utils.logger import DualLogger
 from src.globals import ENABLE_DEBUG_LOGGING
 from src.models.task import Task
 
+logger = DualLogger("Project", "project.log", debug=ENABLE_DEBUG_LOGGING)
 
 class Project:
     """
@@ -15,8 +16,6 @@ class Project:
     Note:
         due_date remains a plain string as date manipulation is not required here.
     """
-
-    logger = DualLogger("Project", "project.log", debug=ENABLE_DEBUG_LOGGING)
 
     def __init__(self, title, description, due_date):
         """Initializes project with information and empty task list.
@@ -50,7 +49,7 @@ class Project:
             ValueError: if empty."""
 
         if not value or not value.strip():
-            self.logger.info(
+            logger.info(
                 f"Title for {"project" + self.title if self.title else "new project"} was empty."
             )
             raise ValueError("Title must not be blank.")
@@ -68,7 +67,7 @@ class Project:
             ValueError: if empty."""
 
         if not value or not value.strip():
-            self.logger.info(f"Description for {self.title} was empty.")
+            logger.info(f"Description for {self.title} was empty.")
             raise ValueError("Description must not be blank.")
 
         self._description = value
@@ -84,7 +83,7 @@ class Project:
             ValueError: if empty."""
 
         if not value or not value.strip():
-            self.logger.info(f"Due date for {self.title} was empty.")
+            logger.info(f"Due date for {self.title} was empty.")
             raise ValueError("Due date must not be blank.")
 
         self._due_date = value
@@ -106,7 +105,7 @@ class Project:
             TypeError: if task is not of type Task"""
 
         if not isinstance(task, Task):
-            self.logger.error(
+            logger.error(
                 f"Adding task to project {self.title} failed: task was of type {type(task)}"
             )
             raise TypeError(
@@ -121,7 +120,7 @@ class Project:
             ValueError: if task title is not in task list, or title is empty."""
 
         if not task_to_remove or not task_to_remove.strip():
-            self.logger.warn(
+            logger.warn(
                 f"Tried to remove task from {self.title} but input was empty."
             )
             raise ValueError(f"Task title cannot be blank.")
@@ -132,7 +131,7 @@ class Project:
             )
             return f"Task {task_to_remove} was successfully removed."
         except ValueError as err:
-            self.logger.info(
+            logger.info(
                 f"No task by name {task_to_remove} found in task list of {self.title}."
             )
             raise ValueError(

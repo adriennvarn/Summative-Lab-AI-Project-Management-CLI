@@ -3,6 +3,7 @@ from src.globals import ENABLE_DEBUG_LOGGING
 from src.models.project import Project
 from src.utils.logger import DualLogger
 
+logger = DualLogger("User", "user.log", debug=ENABLE_DEBUG_LOGGING)
 
 class User:
     """User object containing information about user and a list of projects.
@@ -11,8 +12,6 @@ class User:
         name (str): Name of user.
         email (str): Email address of user.
         projects (list): List of Project objects owned by user."""
-    
-    logger = DualLogger("User", "user.log", debug=ENABLE_DEBUG_LOGGING)
 
     def __init__(self, name, email):
         self.name = name
@@ -51,7 +50,7 @@ class User:
             ValueError: if name is blank"""
 
         if not name or not name.strip():
-            self.logger.info(f"Could not update user {self.name}: entry was empty.")
+            logger.info(f"Could not update user {self.name}: entry was empty.")
             raise ValueError("Name cannot be blank.")
 
         self.name = name
@@ -65,7 +64,7 @@ class User:
         """
 
         if not isinstance(project, Project):
-            self.logger.error(
+            logger.error(
                 f"Expected type Project but received type {type(project)}"
             )
             raise TypeError("Project must be of type Project.")

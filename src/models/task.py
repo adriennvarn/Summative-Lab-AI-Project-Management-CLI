@@ -1,10 +1,9 @@
 from src.utils.logger import DualLogger
 from src.globals import ENABLE_DEBUG_LOGGING
 
+logger = DualLogger("Task", "task.log", debug=ENABLE_DEBUG_LOGGING)
 
 class Task:
-    logger = DualLogger("Task", "task.log", debug=ENABLE_DEBUG_LOGGING)
-
     def __init__(self, title, status, assigned_to):
         self.title = title
         self.status = status
@@ -26,7 +25,7 @@ class Task:
         Raises:
             ValueError: if input empty"""
         if not value or not value.strip():
-            self.logger.info(
+            logger.info(
                 f"Failed to add task title {"to" + self.title if self.title else ""}: entry was empty."
             )
             raise ValueError("Task title cannot be blank.")
@@ -42,7 +41,7 @@ class Task:
         Raises:
             ValueError if blank."""
         if not value or not value.strip():
-            self.logger.info(
+            logger.info(
                 f"Failed to add task status to task {self.title}: entry was empty."
             )
             raise ValueError("Task status cannot be blank.")
@@ -58,7 +57,7 @@ class Task:
         Raises:
             ValueError: if no value is passed in."""
         if not value:
-            self.logger.warn(
+            logger.warn(
                 f"Failed to assign user to {self.title}: Passed no value."
             )
             raise ValueError(
