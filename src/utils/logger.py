@@ -52,12 +52,3 @@ class DualLogger:
 
     def critical(self, msg):
         self.logger.critical(msg)
-
-
-# if __name__ == "__main__":
-#     first = DualLogger("first", filename="test.log", debug=True, mode="a")
-#     first.debug("new debug msg")
-
-#     default = DualLogger("default")
-#     default.debug("debug")
-#     default.warning("warning")
