@@ -1,5 +1,6 @@
 import logging
 import sys
+from pathlib import Path
 
 """
 Logger designed to log to console and, optionally, file. 
@@ -31,7 +32,12 @@ class DualLogger:
 
         # if filename provided, init handler and add to logger. Else, do nothing.
         if filename:
-            file_handler = logging.FileHandler(filename, mode=mode, encoding="utf-8")
+            #  Check if directory and files exist. Create them if not.
+            file_path = Path(f"logs/{filename}")
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.touch(exist_ok=True)
+            
+            file_handler = logging.FileHandler(file_path, mode=mode, encoding="utf-8")
             file_handler.setLevel(logging.DEBUG)
             file_handler.setFormatter(formatter)
             self.logger.addHandler(file_handler)
