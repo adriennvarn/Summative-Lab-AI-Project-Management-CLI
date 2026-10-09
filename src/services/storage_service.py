@@ -20,9 +20,9 @@ class Storage:
         if not filepath or not filepath.strip():
             raise RuntimeError("Filepath must not be empty.")
         if not filepath.endswith(".json"):
-            self.filepath = f"{filepath}.json"
+            Storage.filepath = f"{filepath}.json"
         else:
-            self.filepath = filepath
+            Storage.filepath = filepath
     
     @classmethod
     def store_data(cls, data):
