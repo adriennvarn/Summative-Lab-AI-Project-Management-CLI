@@ -4,7 +4,21 @@ from src.globals import ENABLE_DEBUG_LOGGING
 logger = DualLogger("Task", "task.log", debug=ENABLE_DEBUG_LOGGING)
 
 class Task:
+    """Task object that stores information about the task.
+    
+    Attributes:
+        title (str): Title of the task.
+        status (str): Status of the task.
+        assigned_to (str): Name of the user this task is assigned to."""
+    
     def __init__(self, title, status, assigned_to):
+        """Initializes object.
+        
+        Args:
+            title (str): Title of the task.
+            status (str): Status of the task.
+            assigned_to (str): Name of the user this task is assigned to."""
+            
         self.title = title
         self.status = status
         self.assigned_to = assigned_to
