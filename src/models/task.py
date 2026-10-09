@@ -1,24 +1,26 @@
 from src.utils.logger import DualLogger
 from src.globals import ENABLE_DEBUG_LOGGING
+import pickle
 
 logger = DualLogger("Task", "task.log", debug=ENABLE_DEBUG_LOGGING)
 
+
 class Task:
     """Task object that stores information about the task.
-    
+
     Attributes:
         title (str): Title of the task.
         status (str): Status of the task.
         assigned_to (str): Name of the user this task is assigned to."""
-    
+
     def __init__(self, title, status, assigned_to):
         """Initializes object.
-        
+
         Args:
             title (str): Title of the task.
             status (str): Status of the task.
             assigned_to (str): Name of the user this task is assigned to."""
-            
+
         self.title = title
         self.status = status
         self.assigned_to = assigned_to
@@ -69,14 +71,16 @@ class Task:
     def assigned_to(self, value):
         """Assigns task to a name.
         Raises:
-            ValueError: if no value is passed in."""
+            ValueError: if no value is passed in.
+            TypeError: if passing in value is not of type User"""
         if not value:
-            logger.warn(
-                f"Failed to assign user to {self.title}: Passed no value."
-            )
-            raise ValueError(
-                f"Failed to assign user to {self.title}: No value was passed in."
-            )
+            msg = f"Failed to assign user to {self.title}: No value was passed in."
+            logger.warn(msg)
+            raise ValueError(msg)
+        if not type(value).__name__ == "User":
+            msg = f"Failed to assign user to task {self.task}: Expected type User but received {type(value)}"
+            logger.error(msg)
+            raise TypeError(msg)
 
     def update_task(self, title, status, assigned_to):
         """Updates self.

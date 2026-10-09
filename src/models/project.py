@@ -1,6 +1,6 @@
 from src.utils.logger import DualLogger
 from src.globals import ENABLE_DEBUG_LOGGING
-from src.models.task import Task
+import pickle
 
 logger = DualLogger("Project", "project.log", debug=ENABLE_DEBUG_LOGGING)
 
@@ -104,13 +104,10 @@ class Project:
         Raises:
             TypeError: if task is not of type Task"""
 
-        if not isinstance(task, Task):
-            logger.error(
-                f"Adding task to project {self.title} failed: task was of type {type(task)}"
-            )
-            raise TypeError(
-                f"Attempted to add task of type {type(task)}, which is not valid."
-            )
+        if not type(task).__name__ == "Task":
+            msg = f"Adding task to project {self.title} failed: expected type Task but received {type(task)}"
+            logger.error(msg)
+            raise TypeError(msg)
 
         self.tasks.append(task)
 

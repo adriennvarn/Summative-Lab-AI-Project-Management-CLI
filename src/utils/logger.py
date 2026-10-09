@@ -39,7 +39,9 @@ class DualLogger:
             
             file_handler = logging.FileHandler(file_path, mode=mode, encoding="utf-8")
             file_handler.setLevel(logging.DEBUG)
+            self.logger.flushLevel = logging.DEBUG
             file_handler.setFormatter(formatter)
+
             self.logger.addHandler(file_handler)
 
     # message levels

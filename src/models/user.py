@@ -1,7 +1,7 @@
 import re
 from src.globals import ENABLE_DEBUG_LOGGING
-from src.models.project import Project
 from src.utils.logger import DualLogger
+import pickle
 
 logger = DualLogger("User", "user.log", debug=ENABLE_DEBUG_LOGGING)
 
@@ -39,6 +39,7 @@ class User:
         if re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", value):
             self._email = value
         else:
+            logger.info(f"Invalid email provided: {value}")
             raise ValueError(
                 "Email must be a valid email address in the format [u]user@domain.com[/u]"
             )
@@ -63,8 +64,7 @@ class User:
             TypeError: if object is not of type Project
         """
 
-        if not isinstance(project, Project):
-            logger.error(
-                f"Expected type Project but received type {type(project)}"
-            )
-            raise TypeError("Project must be of type Project.")
+        if not type(project).__name__ == "Project":
+            msg = f"Expected type Project but received type {type(project)}"
+            logger.error(msg)
+            raise TypeError(msg)
