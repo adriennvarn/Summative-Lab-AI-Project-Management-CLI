@@ -1,6 +1,5 @@
 import re
 from src.globals import ENABLE_DEBUG_LOGGING
-from src.models.project import Project
 from src.utils.logger import DualLogger
 
 logger = DualLogger("User", "user.log", debug=ENABLE_DEBUG_LOGGING)
@@ -63,8 +62,7 @@ class User:
             TypeError: if object is not of type Project
         """
 
-        if not isinstance(project, Project):
-            logger.error(
-                f"Expected type Project but received type {type(project)}"
-            )
-            raise TypeError("Project must be of type Project.")
+        if not type(project).__name__ == "Project":
+            msg = f"Expected type Project but received type {type(project)}"
+            logger.error(msg)
+            raise TypeError(msg)
