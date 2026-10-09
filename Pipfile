@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 ollama = "*"
 rich = "*"
-pydantic = "*"
 
 [dev-packages]
 

@@ -47,7 +47,7 @@ project_config = {"required": True, "help": "Name of project."}
 
 """Global list of users"""
 users = []
-storage = Storage("db.json")
+storage = Storage("db")
 
 """Functions to be executed by parsers"""
 

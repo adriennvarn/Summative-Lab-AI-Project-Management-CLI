@@ -1,6 +1,7 @@
 import re
 from src.globals import ENABLE_DEBUG_LOGGING
 from src.utils.logger import DualLogger
+import pickle
 
 logger = DualLogger("User", "user.log", debug=ENABLE_DEBUG_LOGGING)
 
@@ -38,6 +39,7 @@ class User:
         if re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", value):
             self._email = value
         else:
+            logger.info(f"Invalid email provided: {value}")
             raise ValueError(
                 "Email must be a valid email address in the format [u]user@domain.com[/u]"
             )
