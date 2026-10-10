@@ -11,7 +11,10 @@ from src.utils.logger import DualLogger
 from src.globals import *
 
 logger = DualLogger(
-    "Parser Functions", "parser_functions.log", console=CONSOLE_LOGGING, debug=ENABLE_DEBUG_LOGGING
+    "Parser Functions",
+    "parser_functions.log",
+    console=CONSOLE_LOGGING,
+    debug=ENABLE_DEBUG_LOGGING,
 )
 
 """Global list of db"""
@@ -141,7 +144,7 @@ def list_users(_):
     """Lists all users in db."""
     user_tuple = tuple(db)
     UserFormatters.user_table(user_tuple)
-    
+
     # for user in db:
     #     print(user)
 

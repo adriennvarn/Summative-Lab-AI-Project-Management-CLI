@@ -33,7 +33,7 @@ class DualLogger:
 
         # if filename provided, init handler and add to logger. Else, log to global log
         #  Check if directory and files exist. Create them if not.
-        file_path = Path(f"logs/{filename | "global.log"}")
+        file_path = Path(f"logs/{filename if filename else "global.log"}")
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.touch(exist_ok=True)
         
