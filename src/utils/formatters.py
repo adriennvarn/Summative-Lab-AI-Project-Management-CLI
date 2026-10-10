@@ -1,9 +1,10 @@
 from rich.console import Console
 from rich.table import Table
-from rich.align import Align
-from rich import box
 from rich.layout import Layout
 from rich.panel import Panel
+from rich import box
+from rich.text import Text
+from rich.columns import Columns
 
 from src.utils.logger import DualLogger
 from src.globals import *
@@ -15,10 +16,10 @@ logger = DualLogger(
 console = Console()
 
 
-class UserFormatter:
+class Formatter:
     def user_table(*users):
         if not users:
-            raise RuntimeError("No users were provided to UserFormatter.")
+            raise RuntimeError("No users were passed to user_table.")
 
         table = Table(show_header=True, header_style="bold magenta")
         table.add_column("Name")
@@ -31,66 +32,34 @@ class UserFormatter:
 
         console.print(table)
 
-
-class ProjectFormatter:
     def project_table(*projects):
         if not projects:
-            raise RuntimeError("No projects were passed to ProjectFormatter")
-        
+            raise RuntimeError("No projects were passed to task_table")
+
         for project in projects:
             layout = Layout()
+            table = Table(show_header=False, width=75, box=box.SIMPLE)
+            table.add_row(
+                Text(project.title, justify="left"),
+                Text(f"Due: {project.due_date}", justify="right"),
+            )
             layout.split_column(
-                Layout(name="header"),
-                Align(project.description),
-                Align(f"Project contains {len(project.tasks)} tasks."),
+                table,
+                Panel(Text(project.description), box.SIMPLE),
+                Panel(
+                    Text(f"Project contains {len(project.tasks)} tasks."),
+                    box.SIMPLE,
+                ),
             )
-            layout["header"].split_row(
-                Layout(Align(project.title, align="left")),
-                Layout(Align(f"Due: {project.due_date}", align="right"))
-            )
-            
-            console.print(Panel(layout, width=80, padding=0))
-        
-        
-        # for project in projects:
-        #     table = Table(show_header=True, header_style="bold yellow")
-        #     table.add_column()
-        #     table.add_row(Align(project.title, align="left"), Align(project.due_date, align="right"))
-            
-        #     table.box = box.SIMPLE_HEAD
-            
-        #     description_subtable = Table(show_header=False, show_lines=False)
-        #     description_subtable.add_row(project.description)
-        #     table.add_row(description_subtable)
-            
-        #     table.add_row(f"Includes {len(project.tasks)} tasks.")
-        #     console.print(table)
-            
-            
 
-
-"""
-TODO LIST:
-
-- Users
-    - indv user
-    - table for listing all
+            console.print(Panel(layout, width=80))
     
-- Projects
-    - table for indv project
-        - title left justified, due date right justified, one row
-        - description block
-        - tasks in sub table
-    - table for listing all projects
-        - user's name header
-        - title left justified, due date right justified, one row
-        - description block
-        - small row mentioning # of tasks
+    def task_table(*tasks):
+        if not tasks:
+            raise RuntimeError("No tasks were passed to task_table")
         
-- Tasks
-    - invd task
-        - title, status, assigned to, one row
-    - table for listing tasks
-        - proj title header
-        - subtable of tasks (to be reused in indv proj table)
-"""
+        table = Table("Title", "Status", "Assigned To")
+        for task in tasks:
+            table.add_row(task.title, task.status, task.assigned_to.name, style="underline")
+
+        console.print(table)

@@ -5,7 +5,7 @@ from src.services.storage_service import Storage
 from src.services.ai_client import AIClient
 
 from rich import print
-from src.utils.formatters import *
+from src.utils.formatters import Formatter
 
 from src.utils.logger import DualLogger
 from src.globals import *
@@ -145,7 +145,7 @@ def list_users(_):
     if not db:
         print("There are no users yet. Type 'users add -h' to see how!")
     else:
-        UserFormatter.user_table(*db)
+        Formatter.user_table(*db)
 
 
 # ===================== Project Management ==================== #
@@ -220,11 +220,7 @@ def list_projects(args):
     #  Print utility to be used with or without for loop
     def print_all(user):
         if user.projects:
-            # print(f"\n{user.name}'s Projects:")
-            # for project in user.projects:
-            #     print(project)
-            # print()
-            ProjectFormatter.project_table(*user.projects)
+            Formatter.project_table(*user.projects)
         elif args.user and args.user.strip():
             print(f"User {user.name} has no projects.")
 
@@ -320,10 +316,7 @@ def list_tasks(args):
     if not project.tasks:
         print(f"Project {project.title} has no tasks.")
     else:
-        print(f"Tasks for project {project.title}:\n")
-        for task in project.tasks:
-            print(task)
-        print()
+        Formatter.task_table(*project.tasks)
 
 
 # ===================== AI Summary ==================== #
