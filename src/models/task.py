@@ -11,7 +11,7 @@ class Task:
     Attributes:
         title (str): Title of the task.
         status (str): Status of the task.
-        assigned_to (str): Name of the user this task is assigned to."""
+        assigned_to (User): Name of the user this task is assigned to."""
 
     def __init__(self, title, status, assigned_to):
         """Initializes object.
@@ -42,7 +42,7 @@ class Task:
             ValueError: if input empty"""
         if not value or not value.strip():
             logger.info(
-                f"Failed to add task title {"to" + self.title if self.title else ""}: entry was empty."
+                f"Failed to add task title {value}: entry was empty."
             )
             raise ValueError("Task title cannot be blank.")
         self._title = value
@@ -78,16 +78,7 @@ class Task:
             logger.warn(msg)
             raise ValueError(msg)
         if not type(value).__name__ == "User":
-            msg = f"Failed to assign user to task {self.task}: Expected type User but received {type(value)}"
+            msg = f"Failed to assign user to task {self.title}: Expected type User but received {type(value)}"
             logger.error(msg)
             raise TypeError(msg)
-
-    def update_task(self, title, status, assigned_to):
-        """Updates self.
-        Returns:
-            string delimited by |"""
-        self.title = title
-        self.status = status
-        self.assigned_to = assigned_to
-
-        return str(self)
+        self._assigned_to = value

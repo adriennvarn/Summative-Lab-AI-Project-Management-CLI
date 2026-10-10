@@ -45,13 +45,13 @@ class Storage:
     
     @classmethod
     def load_data(cls):
-        """Reads JSON data from class filepath.
+        """Reads pickle data from class filepath.
         
         Returns:
-            data retrieved from JSON file
+            data retrieved from pickle file
         
         Raises:
-            RuntimeError: if JSON cannot be parsed
+            RuntimeError: if pickle cannot be parsed
             FileNotFoundError: if file cannot be found at filepath"""
             
         try:

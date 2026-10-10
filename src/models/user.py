@@ -63,8 +63,8 @@ class User:
         Raises:
             TypeError: if object is not of type Project
         """
-
         if not type(project).__name__ == "Project":
             msg = f"Expected type Project but received type {type(project)}"
             logger.error(msg)
             raise TypeError(msg)
+        self.projects.append(project)
