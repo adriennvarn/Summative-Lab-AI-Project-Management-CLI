@@ -108,7 +108,8 @@ def main():
     list_user_parser = users_subparsers.add_parser("list", help="List all users.")
     list_user_parser.set_defaults(func=pf.list_users)
 
-    # ================= Profile Parsers ================ #
+    # ================= Project Parsers ================ #
+    # Includes AI summary command
 
     projects_parser = subparsers.add_parser("projects", help="Add and manage projects.")
     projects_subparsers = projects_parser.add_subparsers()
@@ -145,6 +146,12 @@ def main():
     # a little tacky cause it's the only place user isn't required, and I didn't want to hard code the string here.
     list_projects_parser.add_argument(*user_names, help=user_config["help"])
     list_projects_parser.set_defaults(func=pf.list_projects)
+    
+    # ------- Request AI Summary ------- #
+    ai_parser = projects_subparsers.add_parser("summary", help="Get a short AI summary of the project.")
+    ai_parser.add_argument(*user_names, **user_config)
+    ai_parser.add_argument(*project_names, **project_config)
+    ai_parser.set_defaults(func=pf.summarize)
     
 
     # ================= Task Parsers ================ #
@@ -187,6 +194,7 @@ def main():
     # a little tacky cause it's the only place title isn't required
     list_tasks_parser.add_argument(*title_names, required=False, help=title_config["help"])
     list_tasks_parser.set_defaults(func=pf.list_tasks)
+        
 
     # ================= Execution Point ================ #
     try:

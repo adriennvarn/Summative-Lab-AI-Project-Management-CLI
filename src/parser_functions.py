@@ -1,12 +1,11 @@
 from src.services.storage_service import Storage
 from rich import print
-from rich.console import Console
-from rich.table import Table
 from src.models.user import User
 from src.models.task import Task
 from src.models.project import Project
 from src.services.storage_service import Storage
 from src.utils.logger import DualLogger
+from src.services.ai_client import AIClient
 from src.globals import ENABLE_DEBUG_LOGGING
 
 logger = DualLogger(
@@ -39,6 +38,7 @@ def find_user(name):
         User
     Raises:
         ValueError: If no user by that name exists"""
+
     user = next((user for user in db if user.name == name), None)
     if not user:
         msg = f"No user named {name} exists."
@@ -57,6 +57,7 @@ def find_project(name, title):
         Project
     Raises:
         ValueError: if no project found under that user"""
+
     user = find_user(name)
     project = next(
         (project for project in user.projects if project.title == title), None
@@ -66,6 +67,7 @@ def find_project(name, title):
         logger.info(msg)
         raise ValueError(msg)
     return project
+
 
 # TODO format
 def find_task(project, title):
@@ -78,6 +80,7 @@ def find_task(project, title):
     Raises:
         TypeError: if project passed in is not of type Project
         ValueError: if no task found under that project"""
+
     if not type(project).__name__ == "Project":
         raise TypeError(f"find_task expected type Project but received {type(project)}")
 
@@ -98,6 +101,7 @@ def add_user(args):
     Args:
         name (str): name of new user
         email (str): email address for new user"""
+
     new_user = User(args.name, args.email)
     db.append(new_user)
     storage.store_data(db)
@@ -111,6 +115,7 @@ def update_user(args):
         name (str): Name of user to update
         new_name (str): Optional, new name to assign user
         email (str): Optional, new email to assign user"""
+
     user = find_user(args.name)
     user.name = (
         args.new_name.strip() if args.new_name and args.new_name.strip() else user.name
@@ -130,8 +135,8 @@ def remove_user(args):
 
 
 # TODO: format as table
-def list_db(_):
-    """Lists all db."""
+def list_users(_):
+    """Lists all users in db."""
     for user in db:
         print(user)
 
@@ -147,6 +152,7 @@ def add_project(args):
         title (str): title of project
         despcription (str): description of project
         due_date (str): due date of project"""
+
     user = find_user(args.user)
     new_project = Project(args.title, args.description, args.due_date)
     user.add_project(new_project)
@@ -163,6 +169,7 @@ def update_project(args):
         new_title (str): Optional, new title to assign project
         description (str): Optional, new description to give project
         due_date (str): Optional, new due date for project"""
+
     project = find_project(args.user, args.title)
     project.title = (
         args.new_title.strip()
@@ -189,6 +196,7 @@ def remove_project(args):
     Args:
         user (str): name of user owning profile
         title (str): title of project to remove"""
+
     user = find_user(args.user)
     project = find_project(args.user, args.title)
     user.projects.remove(project)
@@ -201,6 +209,7 @@ def list_projects(args):
     """Lists all projects for a given user, or all projects in db grouped by user.
     Args:
         user (str): Optional, name of user to list projects of"""
+
     #  Print utility to be used with or without for loop
     def print_all(user):
         if user.projects:
@@ -232,9 +241,9 @@ def add_task(args):
         project (str): title of project to add task to
         title (str): title of task
         status (str): status of task
-        assigned_to (str): name of user to assign to task. 
-            doesn't have to be user owning project, but does have to exist in user db
-        """
+        assigned_to (str): name of user to assign to task.
+            doesn't have to be user owning project, but does have to exist in user db"""
+
     project = find_project(args.user, args.project)
     assigned_user = find_user(args.assigned_to)
     new_task = Task(args.title, args.status, assigned_user)
@@ -253,28 +262,23 @@ def update_task(args):
         new_title (str): Optional, new title for task
         status (str): Optional, new status to assign task
         assigned_to (str): Optional, name of user to reassign task to"""
+
     project = find_project(args.user, args.project)
     task = find_task(project, args.title)
     try:
         assigned_to = find_user(args.assigned_to)
     except ValueError:
         assigned_to = None
-    
+
     task.title = (
         args.new_title.strip()
         if args.new_title and args.new_title.strip()
         else task.title
     )
     task.status = (
-        args.status.strip()
-        if args.status and args.status.strip()
-        else task.status
+        args.status.strip() if args.status and args.status.strip() else task.status
     )
-    task.assigned_to = (
-        assigned_to
-        if assigned_to
-        else task.assigned_to
-    )
+    task.assigned_to = assigned_to if assigned_to else task.assigned_to
     storage.store_data(db)
     print(f"\nTask updated:\n{task}\n")
 
@@ -286,6 +290,7 @@ def remove_task(args):
         user (str): name of user owning project
         project (str): title of project owning task
         title (str): title of task to remove"""
+
     project = find_project(args.user, args.project)
     if not project.tasks:
         print(f"Project {project.title} has no tasks.")
@@ -302,6 +307,7 @@ def list_tasks(args):
     Args:
         user (str): name of user owning project
         project (str): title of project owning tasks to list"""
+
     project = find_project(args.user, args.project)
     if not project.tasks:
         print(f"Project {project.title} has no tasks.")
@@ -317,4 +323,30 @@ def list_tasks(args):
 
 # TODO summarize, takes proj
 def summarize(args):
-    pass
+    """AI Summary of a given project.
+    Args:
+        user (str): name of user owning project
+        project (str): name of project to summarize"""
+
+    project = find_project(args.user, args.project)
+    ai_client = AIClient()
+
+    # pre-formatted prompt
+    prompt = f"""
+        Summarize the following project in one paragraph. Do not invent unsupported details. The response can be shorter than one paragraph if there is not enough information. 
+        The project belongs to {args.user}. The title of the project is "{project.title}". The description of the project is "{project.description}". The due date of the project is "{project.due_date}".
+        The project contains the following tasks:
+        {"".join([f"\nTask: {task.title} | Status: {task.status} | Assigned to: {task.assigned_to.name}" for task in project.tasks])}
+    """
+
+    # Loading indicator
+    print(
+        f"[yellow]The AI is working on your summary. This can take a few moments, so please be patient![/yellow]"
+    )
+
+    # Get and print response
+    response = ai_client.generate_response(prompt)
+    print(f"AI Summary: {response}")
+
+    # Clear history immediately, as each response should be generated freshly.
+    ai_client.clear_history()
