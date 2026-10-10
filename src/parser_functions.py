@@ -15,7 +15,12 @@ logger = DualLogger(
 
 """Global list of users"""
 storage = Storage("db")
-users = storage.load_data()
+try:
+    users = storage.load_data()
+except EOFError:
+    users = []
+except FileNotFoundError:
+    users = []
 
 # =========================== Functions for Parsers ============================== #
 """ Functions to be executed by parsers """
@@ -46,6 +51,18 @@ def find_project(username, title):
     return project
 
 
+def find_task(project, title):
+    if not type(project).__name__ == "Project":
+        raise TypeError(f"find_task expected type Project but received {type(project)}")
+
+    task = next((task for task in project.tasks if task.title == title), None)
+    if not task:
+        msg = f"Project {project.title} does not have a task named {title}."
+        logger.info(msg)
+        raise ValueError(msg)
+    return task
+
+
 # ===================== User Management ==================== #
 
 
@@ -69,6 +86,7 @@ def update_user(args):
 
 
 # TODO: format
+# TODO find all tasks containing user and remove assignment
 def remove_user(args):
     user = find_user(args.name)
     users.remove(user)
@@ -149,24 +167,71 @@ def list_projects(args):
 
 # ===================== Task Management ==================== #
 
+
 # TODO add, takes proj title status assigned_to
 def add_task(args):
-    pass
+    project = find_project(args.user, args.project)
+    assigned_user = find_user(args.assigned_to)
+    new_task = Task(args.title, args.status, assigned_user)
+    project.tasks.append(new_task)
+    storage.store_data(users)
+    print(f"Task '{new_task.title} added to project {project.title}.'")
+
 
 # TODO update, takes proj title status assigned_to
 def update_task(args):
-    pass
+    project = find_project(args.user, args.project)
+    task = find_task(project, args.title)
+    try:
+        assigned_to = find_user(args.assigned_to)
+    except ValueError:
+        assigned_to = None
+    
+    task.title = (
+        args.title.strip()
+        if args.title and args.title.strip()
+        else task.title
+    )
+    task.status = (
+        args.status.strip()
+        if args.status and args.status.strip()
+        else task.status
+    )
+    task.assigned_to = (
+        assigned_to
+        if assigned_to
+        else task.assigned_to
+    )
+    storage.store_data(users)
+    print(f"\nTask updated:\n{task}\n")
+
 
 # TODO remove, takes proj title
 def remove_task(args):
-    pass
+    project = find_project(args.user, args.project)
+    if not project.tasks:
+        print(f"Project {project.title} has no tasks.")
+    else:
+        task = find_task(project, args.title)
+        project.tasks.remove(task)
+        print(f"Task {task.title} removed from {project.title}.")
+        storage.store_data(users)
+
 
 # TODO list, takes proj
 def list_tasks(args):
-    pass
+    project = find_project(args.user, args.project)
+    if not project.tasks:
+        print(f"Project {project.title} has no tasks.")
+    else:
+        print(f"Tasks for project {project.title}:\n")
+        for task in project.tasks:
+            print(task)
+        print()
 
 
 # ===================== AI Summary ==================== #
+
 
 # TODO summarize, takes proj
 def summarize(args):
