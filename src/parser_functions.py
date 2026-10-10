@@ -23,6 +23,7 @@ users = storage.load_data()
 # ===================== Utility Functions ==================== #
 
 
+# TODO format
 def find_user(name):
     user = next((user for user in users if user.name == name), None)
     if not user:
@@ -32,6 +33,7 @@ def find_user(name):
     return user
 
 
+# TODO format
 def find_project(username, title):
     user = find_user(username)
     project = next(
@@ -47,6 +49,7 @@ def find_project(username, title):
 # ===================== User Management ==================== #
 
 
+# TODO format
 def add_user(args):
     new_user = User(args.name, args.email)
     users.append(new_user)
@@ -54,6 +57,7 @@ def add_user(args):
     print(f"\n[green]New User added:[/green]\n{new_user}\n")
 
 
+# TODO: format
 def update_user(args):
     user = find_user(args.name)
     user.name = (
@@ -81,6 +85,7 @@ def list_users(_):
 # ===================== Project Management ==================== #
 
 
+# TODO format
 def add_project(args):
     user = find_user(args.user)
     new_project = Project(args.title, args.description, args.due_date)
@@ -131,7 +136,7 @@ def list_projects(args):
             print()
         elif args.user and args.user.strip():
             print(f"User {user.name} has no projects.")
-        
+
     #  if user provided, print only that one
     #  otherwise, print all
     if args.user and args.user.strip():
@@ -145,14 +150,24 @@ def list_projects(args):
 # ===================== Task Management ==================== #
 
 # TODO add, takes proj title status assigned_to
+def add_task(args):
+    pass
 
 # TODO update, takes proj title status assigned_to
+def update_task(args):
+    pass
 
 # TODO remove, takes proj title
+def remove_task(args):
+    pass
 
 # TODO list, takes proj
+def list_tasks(args):
+    pass
 
 
 # ===================== AI Summary ==================== #
 
 # TODO summarize, takes proj
+def summarize(args):
+    pass

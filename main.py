@@ -58,6 +58,10 @@ description_names = ("-d", "--description")
 description_config = {"help": "Description of project."}
 due_date_name = "--due_date"
 due_date_config = {"help": "Date project is due."}
+status_names = ("-s", "--status")
+status_config = {"help": "Status of task."}
+assigned_to_names = ("-a", "--assigned_to")
+assigned_to_config = {"help": "User the task is assigned to."}
 
 
 
@@ -140,8 +144,42 @@ def main():
     # a little tacky cause it's the only place user isn't required, and I didn't want to hard code the string here.
     list_projects_parser.add_argument(*user_names, help=user_config["help"])
     list_projects_parser.set_defaults(func=pf.list_projects)
+    
 
     # ================= Task Parsers ================ #
+    
+    task_parser = subparsers.add_parser("tasks", help="Manage a project's tasks.")
+    task_subparsers = task_parser.add_subparsers()
+    
+    # ------- Add task ------- #
+    add_task_parser = task_subparsers.add_parser("add", help="Add a new task to a given project.")
+    add_task_parser.add_argument(*project_names, **project_config)
+    add_task_parser.add_argument(*title_names, **title_config)
+    add_task_parser.add_argument(*status_names, required=True, **status_config)
+    add_task_parser.add_argument(*assigned_to_names, required=True, **assigned_to_config)
+    add_task_parser.set_default(func=pf.add_task)
+    
+    # ------- Update task ------- #
+    update_task_parser = task_subparsers.add_parser("update", help="Update an existing task.")
+    update_task_parser.add_argument(*project_names, **project_config)
+    update_task_parser.add_argument(*title_names, **title_config)
+    update_task_parser.add_argument("--new_title", help="New title for task.")
+    update_task_parser.add_argument(*status_names, **status_config)
+    update_task_parser.add_argument(*assigned_to_names, **assigned_to_config)
+    update_task_parser.set_defaults(func=pf.update_task)
+    
+    # ------- Remove task ------- #
+    remove_task_parser = task_subparsers.add_parser("remove", help="Remove an existing task.")
+    remove_task_parser.add_argument(*project_names, **project_config)
+    remove_task_parser.add_argument(*title_names, **title_config)
+    remove_task_parser.set_defaults(func=pf.remove_task)
+    
+    # ------- List tasks ------- #
+    list_tasks_parser = task_subparsers.add_parser("list", help="List tasks for a given project.")
+    list_tasks_parser.add_argument(*project_names, **project_config)
+    # a little tacky cause it's the only place title isn't required
+    list_tasks_parser.add_argument(*title_names, required=False, help=title_config["help"])
+    list_tasks_parser.set_defaults(func=pf.list_tasks)
 
     # ================= Execution Point ================ #
     try:
