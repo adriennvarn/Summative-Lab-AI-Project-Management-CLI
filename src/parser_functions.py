@@ -13,14 +13,16 @@ logger = DualLogger(
     "Parser Functions", "parser_functions.log", debug=ENABLE_DEBUG_LOGGING
 )
 
-"""Global list of users"""
+"""Global list of db"""
 storage = Storage("db")
+
+# if data can't be loaded, default to empty db
 try:
-    users = storage.load_data()
+    db = storage.load_data()
 except EOFError:
-    users = []
+    db = []
 except FileNotFoundError:
-    users = []
+    db = []
 
 # =========================== Functions for Parsers ============================== #
 """ Functions to be executed by parsers """
@@ -30,7 +32,14 @@ except FileNotFoundError:
 
 # TODO format
 def find_user(name):
-    user = next((user for user in users if user.name == name), None)
+    """Finds user from provided name.
+    Args:
+        name (str): Name assigned to user.
+    Returns:
+        User
+    Raises:
+        ValueError: If no user by that name exists"""
+    user = next((user for user in db if user.name == name), None)
     if not user:
         msg = f"No user named {name} exists."
         logger.info(msg)
@@ -39,8 +48,16 @@ def find_user(name):
 
 
 # TODO format
-def find_project(username, title):
-    user = find_user(username)
+def find_project(name, title):
+    """Finds project from provided user's name and project title.
+    Args:
+        name (str): name of user
+        title (str): name of project
+    Returns:
+        Project
+    Raises:
+        ValueError: if no project found under that user"""
+    user = find_user(name)
     project = next(
         (project for project in user.projects if project.title == title), None
     )
@@ -50,8 +67,17 @@ def find_project(username, title):
         raise ValueError(msg)
     return project
 
-
+# TODO format
 def find_task(project, title):
+    """Finds task given a project and task title.
+    Args:
+        project (Project): project to look for task under
+        title (str): title of task
+    Returns:
+        Task
+    Raises:
+        TypeError: if project passed in is not of type Project
+        ValueError: if no task found under that project"""
     if not type(project).__name__ == "Project":
         raise TypeError(f"find_task expected type Project but received {type(project)}")
 
@@ -68,35 +94,45 @@ def find_task(project, title):
 
 # TODO format
 def add_user(args):
+    """Adds user to db
+    Args:
+        name (str): name of new user
+        email (str): email address for new user"""
     new_user = User(args.name, args.email)
-    users.append(new_user)
-    storage.store_data(users)
+    db.append(new_user)
+    storage.store_data(db)
     print(f"\n[green]New User added:[/green]\n{new_user}\n")
 
 
-# TODO: format
+# TODO format
 def update_user(args):
+    """Updates existing user in db
+    Args:
+        name (str): Name of user to update
+        new_name (str): Optional, new name to assign user
+        email (str): Optional, new email to assign user"""
     user = find_user(args.name)
     user.name = (
         args.new_name.strip() if args.new_name and args.new_name.strip() else user.name
     )
     user.email = args.email.strip() if args.email and args.email.strip() else user.email
-    storage.store_data(users)
+    storage.store_data(db)
     print(f"User updated:\n{user}")
 
 
-# TODO: format
+# TODO format
 # TODO find all tasks containing user and remove assignment
 def remove_user(args):
     user = find_user(args.name)
-    users.remove(user)
-    storage.store_data(users)
+    db.remove(user)
+    storage.store_data(db)
     print(f"User {args.name} removed.")
 
 
 # TODO: format as table
-def list_users(_):
-    for user in users:
+def list_db(_):
+    """Lists all db."""
+    for user in db:
         print(user)
 
 
@@ -105,15 +141,28 @@ def list_users(_):
 
 # TODO format
 def add_project(args):
+    """Adds a project to a given user.
+    Args:
+        user (str): name of user to assign project to
+        title (str): title of project
+        despcription (str): description of project
+        due_date (str): due date of project"""
     user = find_user(args.user)
     new_project = Project(args.title, args.description, args.due_date)
     user.add_project(new_project)
-    storage.store_data(users)
+    storage.store_data(db)
     print(f"\n[green]Project added to {user.name}'s profile:[/green]\n{new_project}\n")
 
 
 # TODO format
 def update_project(args):
+    """Updates existing project for given user
+    Args:
+        user (str): name of user project belongs to
+        title (str): title of project to update
+        new_title (str): Optional, new title to assign project
+        description (str): Optional, new description to give project
+        due_date (str): Optional, new due date for project"""
     project = find_project(args.user, args.title)
     project.title = (
         args.new_title.strip()
@@ -130,21 +179,28 @@ def update_project(args):
         if args.due_date and args.due_date.strip()
         else project.due_date
     )
-    storage.store_data(users)
+    storage.store_data(db)
     print(f"\nProject updated:\n{project}\n")
 
 
 # TODO format
 def remove_project(args):
+    """Remove existing project for given user.
+    Args:
+        user (str): name of user owning profile
+        title (str): title of project to remove"""
     user = find_user(args.user)
     project = find_project(args.user, args.title)
     user.projects.remove(project)
-    storage.store_data(users)
+    storage.store_data(db)
     print(f"Project {project.title} removed from {user.name}'s profile.")
 
 
 # TODO format
 def list_projects(args):
+    """Lists all projects for a given user, or all projects in db grouped by user.
+    Args:
+        user (str): Optional, name of user to list projects of"""
     #  Print utility to be used with or without for loop
     def print_all(user):
         if user.projects:
@@ -161,25 +217,42 @@ def list_projects(args):
         user = find_user(args.user)
         print_all(user)
     else:
-        for user in users:
+        for user in db:
             print_all(user)
 
 
 # ===================== Task Management ==================== #
 
 
-# TODO add, takes proj title status assigned_to
+# TODO format
 def add_task(args):
+    """Add task to given user's project.
+    Args:
+        user (str): name of user that owns project
+        project (str): title of project to add task to
+        title (str): title of task
+        status (str): status of task
+        assigned_to (str): name of user to assign to task. 
+            doesn't have to be user owning project, but does have to exist in user db
+        """
     project = find_project(args.user, args.project)
     assigned_user = find_user(args.assigned_to)
     new_task = Task(args.title, args.status, assigned_user)
     project.tasks.append(new_task)
-    storage.store_data(users)
+    storage.store_data(db)
     print(f"Task '{new_task.title} added to project {project.title}.'")
 
 
-# TODO update, takes proj title status assigned_to
+# TODO format
 def update_task(args):
+    """Update existing task for a given user's project.
+    Args:
+        user (str): name of user owning project
+        project (str): title of project owning task
+        title (str): current title of project
+        new_title (str): Optional, new title for task
+        status (str): Optional, new status to assign task
+        assigned_to (str): Optional, name of user to reassign task to"""
     project = find_project(args.user, args.project)
     task = find_task(project, args.title)
     try:
@@ -188,8 +261,8 @@ def update_task(args):
         assigned_to = None
     
     task.title = (
-        args.title.strip()
-        if args.title and args.title.strip()
+        args.new_title.strip()
+        if args.new_title and args.new_title.strip()
         else task.title
     )
     task.status = (
@@ -202,12 +275,17 @@ def update_task(args):
         if assigned_to
         else task.assigned_to
     )
-    storage.store_data(users)
+    storage.store_data(db)
     print(f"\nTask updated:\n{task}\n")
 
 
-# TODO remove, takes proj title
+# TODO format
 def remove_task(args):
+    """Remove existing task from a given user's project.
+    Args:
+        user (str): name of user owning project
+        project (str): title of project owning task
+        title (str): title of task to remove"""
     project = find_project(args.user, args.project)
     if not project.tasks:
         print(f"Project {project.title} has no tasks.")
@@ -215,11 +293,15 @@ def remove_task(args):
         task = find_task(project, args.title)
         project.tasks.remove(task)
         print(f"Task {task.title} removed from {project.title}.")
-        storage.store_data(users)
+        storage.store_data(db)
 
 
-# TODO list, takes proj
+# TODO format
 def list_tasks(args):
+    """List all tasks for a given project.
+    Args:
+        user (str): name of user owning project
+        project (str): title of project owning tasks to list"""
     project = find_project(args.user, args.project)
     if not project.tasks:
         print(f"Project {project.title} has no tasks.")
