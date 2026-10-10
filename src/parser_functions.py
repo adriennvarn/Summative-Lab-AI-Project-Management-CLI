@@ -89,6 +89,7 @@ def add_project(args):
     print(f"\n[green]Project added to {user.name}'s profile:[/green]\n{new_project}\n")
 
 
+# TODO format
 def update_project(args):
     project = find_project(args.user, args.title)
     project.title = (
@@ -110,25 +111,35 @@ def update_project(args):
     print(f"\nProject updated:\n{project}\n")
 
 
-# TODO remove
+# TODO format
 def remove_project(args):
-    pass
+    user = find_user(args.user)
+    project = find_project(args.user, args.title)
+    user.projects.remove(project)
+    storage.store_data(users)
+    print(f"Project {project.title} removed from {user.name}'s profile.")
 
 
 # TODO format
 def list_projects(args):
+    #  Print utility to be used with or without for loop
+    def print_all(user):
+        if user.projects:
+            print(f"\n{user.name}'s Projects:")
+            for project in user.projects:
+                print(project)
+            print()
+        elif args.user and args.user.strip():
+            print(f"User {user.name} has no projects.")
+        
+    #  if user provided, print only that one
+    #  otherwise, print all
     if args.user and args.user.strip():
         user = find_user(args.user)
-        for project in user.projects:
-            print(project)
-
+        print_all(user)
     else:
         for user in users:
-            if user.projects:
-                print(f"\n{user.name}'s Projects:")
-                for project in user.projects:
-                    print(project)
-                print()
+            print_all(user)
 
 
 # ===================== Task Management ==================== #
