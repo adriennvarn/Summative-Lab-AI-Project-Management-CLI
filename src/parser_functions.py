@@ -34,11 +34,14 @@ def find_user(name):
 
 def find_project(username, title):
     user = find_user(username)
-    project = next((project for project in user.projects if project.title == title), None)
+    project = next(
+        (project for project in user.projects if project.title == title), None
+    )
     if not project:
         msg = f"User {user.name} does not have a project named {title}."
         logger.info(msg)
         raise ValueError(msg)
+    return project
 
 
 # ===================== User Management ==================== #
@@ -53,8 +56,10 @@ def add_user(args):
 
 def update_user(args):
     user = find_user(args.name)
-    user.name = args.new_name if args.new_name and args.new_name.strip() else user.name
-    user.email = args.email if args.email and args.email.strip() else user.email
+    user.name = (
+        args.new_name.strip() if args.new_name and args.new_name.strip() else user.name
+    )
+    user.email = args.email.strip() if args.email and args.email.strip() else user.email
     storage.store_data(users)
     print(f"User updated:\n{user}")
 
@@ -85,9 +90,25 @@ def add_project(args):
 
 
 def update_project(args):
-    user = find_user(args.user)
-    
-        
+    project = find_project(args.user, args.title)
+    project.title = (
+        args.new_title.strip()
+        if args.new_title and args.new_title.strip()
+        else project.title
+    )
+    project.description = (
+        args.description.strip()
+        if args.description and args.description.strip()
+        else project.description
+    )
+    project.due_date = (
+        args.due_date.strip()
+        if args.due_date and args.due_date.strip()
+        else project.due_date
+    )
+    storage.store_data(users)
+    print(f"\nProject updated:\n{project}\n")
+
 
 # TODO remove
 def remove_project(args):

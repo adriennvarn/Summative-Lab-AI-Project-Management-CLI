@@ -124,6 +124,7 @@ def main():
     update_project_parser = projects_subparsers.add_parser("update", help="Update an existing project.")
     update_project_parser.add_argument(*user_names, **user_config)
     update_project_parser.add_argument(*title_names, **title_config)
+    update_project_parser.add_argument("--new_title", help="New title for project.")
     update_project_parser.add_argument(*description_names, **description_config)
     update_project_parser.add_argument(due_date_name, **due_date_config)
     update_project_parser.set_defaults(func=pf.update_project)
