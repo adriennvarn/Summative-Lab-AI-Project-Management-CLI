@@ -14,7 +14,7 @@ Mode changes write mode if file logging is enabled.
 
 
 class DualLogger:
-    def __init__(self, name, filename=None, debug=False, mode="a"):
+    def __init__(self, name, filename=None, console=True, debug=False, mode="a"):
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.DEBUG)
 
@@ -24,25 +24,25 @@ class DualLogger:
             datefmt="%Y-%m-%d %H:%M:%S",
         )
 
-        # init stream handler and add to logger
-        stream_handler = logging.StreamHandler(sys.stdout)
-        stream_handler.setLevel(logging.DEBUG if debug else logging.WARNING)
-        stream_handler.setFormatter(formatter)
-        self.logger.addHandler(stream_handler)
+        # if console logging is desired, init stream handler
+        if console:
+            stream_handler = logging.StreamHandler(sys.stdout)
+            stream_handler.setLevel(logging.DEBUG if debug else logging.WARNING)
+            stream_handler.setFormatter(formatter)
+            self.logger.addHandler(stream_handler)
 
-        # if filename provided, init handler and add to logger. Else, do nothing.
-        if filename:
-            #  Check if directory and files exist. Create them if not.
-            file_path = Path(f"logs/{filename}")
-            file_path.parent.mkdir(parents=True, exist_ok=True)
-            file_path.touch(exist_ok=True)
-            
-            file_handler = logging.FileHandler(file_path, mode=mode, encoding="utf-8")
-            file_handler.setLevel(logging.DEBUG)
-            self.logger.flushLevel = logging.DEBUG
-            file_handler.setFormatter(formatter)
+        # if filename provided, init handler and add to logger. Else, log to global log
+        #  Check if directory and files exist. Create them if not.
+        file_path = Path(f"logs/{filename | "global.log"}")
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.touch(exist_ok=True)
+        
+        file_handler = logging.FileHandler(file_path, mode=mode, encoding="utf-8")
+        file_handler.setLevel(logging.DEBUG)
+        self.logger.flushLevel = logging.DEBUG
+        file_handler.setFormatter(formatter)
 
-            self.logger.addHandler(file_handler)
+        self.logger.addHandler(file_handler)
 
     # message levels
 

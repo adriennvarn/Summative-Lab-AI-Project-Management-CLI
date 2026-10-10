@@ -1,8 +1,8 @@
 from src.utils.logger import DualLogger
-from src.globals import ENABLE_DEBUG_LOGGING
+from src.globals import *
 import pickle
 
-logger = DualLogger("Task", "task.log", debug=ENABLE_DEBUG_LOGGING)
+logger = DualLogger("Task", "task.log", console=CONSOLE_LOGGING, debug=ENABLE_DEBUG_LOGGING)
 
 
 class Task:

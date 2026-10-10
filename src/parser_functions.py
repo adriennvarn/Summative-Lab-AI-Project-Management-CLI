@@ -1,15 +1,17 @@
-from src.services.storage_service import Storage
-from rich import print
 from src.models.user import User
 from src.models.task import Task
 from src.models.project import Project
 from src.services.storage_service import Storage
-from src.utils.logger import DualLogger
 from src.services.ai_client import AIClient
-from src.globals import ENABLE_DEBUG_LOGGING
+
+from rich import print
+from src.utils.formatters import UserFormatters
+
+from src.utils.logger import DualLogger
+from src.globals import *
 
 logger = DualLogger(
-    "Parser Functions", "parser_functions.log", debug=ENABLE_DEBUG_LOGGING
+    "Parser Functions", "parser_functions.log", console=CONSOLE_LOGGING, debug=ENABLE_DEBUG_LOGGING
 )
 
 """Global list of db"""
@@ -137,8 +139,11 @@ def remove_user(args):
 # TODO: format as table
 def list_users(_):
     """Lists all users in db."""
-    for user in db:
-        print(user)
+    user_tuple = tuple(db)
+    UserFormatters.user_table(user_tuple)
+    
+    # for user in db:
+    #     print(user)
 
 
 # ===================== Project Management ==================== #
@@ -321,7 +326,7 @@ def list_tasks(args):
 # ===================== AI Summary ==================== #
 
 
-# TODO summarize, takes proj
+# TODO format
 def summarize(args):
     """AI Summary of a given project.
     Args:

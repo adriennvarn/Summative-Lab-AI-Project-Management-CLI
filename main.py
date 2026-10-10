@@ -8,7 +8,7 @@ from src.models.task import Task
 from src.models.project import Project
 from src.services.storage_service import Storage
 from src.utils.logger import DualLogger
-from src.globals import ENABLE_DEBUG_LOGGING
+from src.globals import *
 import argparse
 import src.parser_functions as pf
 import traceback
@@ -42,7 +42,7 @@ cmds:
 # =========================== Globals ============================== #
 
 """File level logger object"""
-logger = DualLogger("Main", "main.log", debug=ENABLE_DEBUG_LOGGING)
+logger = DualLogger("Main", "main.log", console=CONSOLE_LOGGING, debug=ENABLE_DEBUG_LOGGING)
 
 """Arugument information that is used more than once."""
 name_names = ("-n", "--name")
