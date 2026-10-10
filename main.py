@@ -121,11 +121,22 @@ def main():
     add_project_parser.set_defaults(func=pf.add_project)
 
     # ------- Update project ------- #
+    update_project_parser = projects_subparsers.add_parser("update", help="Update an existing project.")
+    update_project_parser.add_argument(*user_names, **user_config)
+    update_project_parser.add_argument(*title_names, **title_config)
+    update_project_parser.add_argument(*description_names, **description_config)
+    update_project_parser.add_argument(due_date_name, **due_date_config)
+    update_project_parser.set_defaults(func=pf.update_project)
 
     # ------- Remove project ------- #
+    remove_project_parser = projects_subparsers.add_parser("remove", help="Remove an existing project.")
+    remove_project_parser.add_argument(*user_names, **user_config)
+    remove_project_parser.add_argument(*title_names, **title_config)
+    remove_project_parser.set_defaults(func=pf.remove_project)
 
     # ------- List projects ------- #
     list_projects_parser = projects_subparsers.add_parser("list", help="List projects for given user.")
+    # a little tacky cause it's the only place user isn't required, and I didn't want to hard code the string here.
     list_projects_parser.add_argument(*user_names, help=user_config["help"])
     list_projects_parser.set_defaults(func=pf.list_projects)
 

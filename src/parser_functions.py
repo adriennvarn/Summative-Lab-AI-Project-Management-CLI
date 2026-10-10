@@ -9,7 +9,9 @@ from src.services.storage_service import Storage
 from src.utils.logger import DualLogger
 from src.globals import ENABLE_DEBUG_LOGGING
 
-logger = DualLogger("Parser Functions", "parser_functions.log", debug=ENABLE_DEBUG_LOGGING)
+logger = DualLogger(
+    "Parser Functions", "parser_functions.log", debug=ENABLE_DEBUG_LOGGING
+)
 
 """Global list of users"""
 storage = Storage("db")
@@ -22,12 +24,21 @@ users = storage.load_data()
 
 
 def find_user(name):
-    return next((user for user in users if user.name == name), None)
+    user = next((user for user in users if user.name == name), None)
+    if not user:
+        msg = f"No user named {name} exists."
+        logger.info(msg)
+        raise ValueError(msg)
+    return user
 
 
 def find_project(username, title):
     user = find_user(username)
-    return next((project for project in user.projects if project.title == title), None)
+    project = next((project for project in user.projects if project.title == title), None)
+    if not project:
+        msg = f"User {user.name} does not have a project named {title}."
+        logger.info(msg)
+        raise ValueError(msg)
 
 
 # ===================== User Management ==================== #
@@ -41,7 +52,6 @@ def add_user(args):
 
 
 def update_user(args):
-    # TODO: cope with no user found
     user = find_user(args.name)
     user.name = args.new_name if args.new_name and args.new_name.strip() else user.name
     user.email = args.email if args.email and args.email.strip() else user.email
@@ -52,14 +62,9 @@ def update_user(args):
 # TODO: format
 def remove_user(args):
     user = find_user(args.name)
-    if user:
-        users.remove(user)
-        storage.store_data(users)
-        print(f"User {args.name} removed.")
-    else:
-        msg = f"Failed to remove user {args.name}: Does not exist."
-        logger.info(msg)
-        raise ValueError(msg)
+    users.remove(user)
+    storage.store_data(users)
+    print(f"User {args.name} removed.")
 
 
 # TODO: format as table
@@ -73,29 +78,26 @@ def list_users(_):
 
 def add_project(args):
     user = find_user(args.user)
-    if not user:
-        msg = f"No user named {args.user} exists."
-        logger.info(msg)
-        raise ValueError(msg)
-
     new_project = Project(args.title, args.description, args.due_date)
     user.add_project(new_project)
     storage.store_data(users)
     print(f"\n[green]Project added to {user.name}'s profile:[/green]\n{new_project}\n")
+
+
+def update_project(args):
+    user = find_user(args.user)
     
-# TODO update
+        
 
 # TODO remove
+def remove_project(args):
+    pass
+
 
 # TODO format
 def list_projects(args):
     if args.user and args.user.strip():
         user = find_user(args.user)
-        if not user:
-            msg = f"No user named {args.user} exists."
-            logger.info(f"Failed to list projects: {msg}")
-            raise ValueError(msg)
-
         for project in user.projects:
             print(project)
 
@@ -106,6 +108,7 @@ def list_projects(args):
                 for project in user.projects:
                     print(project)
                 print()
+
 
 # ===================== Task Management ==================== #
 
