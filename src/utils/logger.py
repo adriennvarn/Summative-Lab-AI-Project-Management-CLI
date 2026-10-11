@@ -6,11 +6,19 @@ from pathlib import Path
 Logger designed to log to console and, optionally, file. 
 If filename specified, saved to file.
 
+Console flag enables logging to console.
+
 Debug flag enables debug level logging to console, else only warning and up.
 Debug level is always sent to file.
 
 Mode changes write mode if file logging is enabled.
 """
+
+###########################
+# Constant to force all file logs to the global file path
+GLOBAL_FILE = True
+###########################
+
 
 
 class DualLogger:
@@ -33,7 +41,11 @@ class DualLogger:
 
         # if filename provided, init handler and add to logger. Else, log to global log
         #  Check if directory and files exist. Create them if not.
-        file_path = Path(f"logs/{filename if filename else "global.log"}")
+        if GLOBAL_FILE or not filename:
+            target_file = "global.log"
+        elif filename:
+            target_file = filename
+        file_path = Path(f"logs/{target_file}")
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.touch(exist_ok=True)
         
