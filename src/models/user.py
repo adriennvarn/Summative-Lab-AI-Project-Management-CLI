@@ -1,9 +1,9 @@
 import re
-from src.globals import ENABLE_DEBUG_LOGGING
+from src.globals import *
 from src.utils.logger import DualLogger
 import pickle
 
-logger = DualLogger("User", "user.log", debug=ENABLE_DEBUG_LOGGING)
+logger = DualLogger("User", "user.log", console=CONSOLE_LOGGING, debug=ENABLE_DEBUG_LOGGING)
 
 class User:
     """User object containing information about user and a list of projects.
