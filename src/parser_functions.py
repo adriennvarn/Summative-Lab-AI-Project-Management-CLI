@@ -4,7 +4,7 @@ from src.models.project import Project
 from src.services.storage_service import Storage
 from src.services.ai_client import AIClient
 
-from rich import print
+from rich import print as richprint
 from src.utils.formatters import Formatter
 
 from src.utils.logger import DualLogger
@@ -34,7 +34,12 @@ except FileNotFoundError:
 # ===================== Utility Functions ==================== #
 
 
-# TODO format
+def print(str):
+    """Surrounds all messages in yellow tags, but still allows internal rich formatting.
+    Adds line breaks to beginning and end for spacing."""
+    richprint(f"\n[yellow]{str}[/yellow]\n")
+
+
 def find_user(name):
     """Finds user from provided name.
     Args:
@@ -52,7 +57,6 @@ def find_user(name):
     return user
 
 
-# TODO format
 def find_project(name, title):
     """Finds project from provided user's name and project title.
     Args:
@@ -74,7 +78,6 @@ def find_project(name, title):
     return project
 
 
-# TODO format
 def find_task(project, title):
     """Finds task given a project and task title.
     Args:
@@ -100,7 +103,6 @@ def find_task(project, title):
 # ===================== User Management ==================== #
 
 
-# TODO format
 def add_user(args):
     """Adds user to db
     Args:
@@ -110,10 +112,10 @@ def add_user(args):
     new_user = User(args.name, args.email)
     db.append(new_user)
     storage.store_data(db)
-    print(f"\n[green]New User added:[/green]\n{new_user}\n")
+    print("[green]New User added:[/green]")
+    Formatter.user_table(new_user)
 
 
-# TODO format
 def update_user(args):
     """Updates existing user in db
     Args:
@@ -127,19 +129,28 @@ def update_user(args):
     )
     user.email = args.email.strip() if args.email and args.email.strip() else user.email
     storage.store_data(db)
-    print(f"User updated:\n{user}")
+    print("User updated:")
+    Formatter.user_table(user)
 
 
-# TODO format
-# TODO find all tasks containing user and remove assignment
 def remove_user(args):
-    user = find_user(args.name)
-    db.remove(user)
+    """Removes specified user.
+    Args:
+        name (str): name of user to remove"""
+    user_to_remove = find_user(args.name)
+    db.remove(user_to_remove)
+
+    # removes user from any tasks they're assigned to
+    for user in db:
+        for project in user.projects:
+            for task in project.tasks:
+                if task.assigned_to == user_to_remove:
+                    task.assigned_to = User("none", "xx@yy.zz")
+
     storage.store_data(db)
     print(f"User {args.name} removed.")
 
 
-# TODO: format as table
 def list_users(_):
     """Lists all users in db."""
     if not db:
@@ -151,7 +162,6 @@ def list_users(_):
 # ===================== Project Management ==================== #
 
 
-# TODO format
 def add_project(args):
     """Adds a project to a given user.
     Args:
@@ -164,10 +174,10 @@ def add_project(args):
     new_project = Project(args.title, args.description, args.due_date)
     user.add_project(new_project)
     storage.store_data(db)
-    print(f"\n[green]Project added to {user.name}'s profile:[/green]\n{new_project}\n")
+    print(f"[green]Project added to {user.name}'s profile:[/green]")
+    Formatter.project_table(new_project)
 
 
-# TODO format
 def update_project(args):
     """Updates existing project for given user
     Args:
@@ -194,10 +204,10 @@ def update_project(args):
         else project.due_date
     )
     storage.store_data(db)
-    print(f"\nProject updated:\n{project}\n")
+    print("Project updated:")
+    Formatter.project_table(project)
 
 
-# TODO format
 def remove_project(args):
     """Remove existing project for given user.
     Args:
@@ -211,7 +221,6 @@ def remove_project(args):
     print(f"Project {project.title} removed from {user.name}'s profile.")
 
 
-# TODO format
 def list_projects(args):
     """Lists all projects for a given user, or all projects in db grouped by user.
     Args:
@@ -237,7 +246,6 @@ def list_projects(args):
 # ===================== Task Management ==================== #
 
 
-# TODO format
 def add_task(args):
     """Add task to given user's project.
     Args:
@@ -253,10 +261,10 @@ def add_task(args):
     new_task = Task(args.title, args.status, assigned_user)
     project.tasks.append(new_task)
     storage.store_data(db)
-    print(f"Task '{new_task.title} added to project {project.title}.'")
+    print(f"Task added to project '{project.title}':")
+    Formatter.task_table(new_task)
 
 
-# TODO format
 def update_task(args):
     """Update existing task for a given user's project.
     Args:
@@ -284,10 +292,10 @@ def update_task(args):
     )
     task.assigned_to = assigned_to if assigned_to else task.assigned_to
     storage.store_data(db)
-    print(f"\nTask updated:\n{task}\n")
+    print("Task updated:")
+    Formatter.task_table(task)
 
 
-# TODO format
 def remove_task(args):
     """Remove existing task from a given user's project.
     Args:
@@ -305,7 +313,6 @@ def remove_task(args):
         storage.store_data(db)
 
 
-# TODO format
 def list_tasks(args):
     """List all tasks for a given project.
     Args:
@@ -322,7 +329,6 @@ def list_tasks(args):
 # ===================== AI Summary ==================== #
 
 
-# TODO format
 def summarize(args):
     """AI Summary of a given project.
     Args:
@@ -342,12 +348,12 @@ def summarize(args):
 
     # Loading indicator
     print(
-        f"[yellow]The AI is working on your summary. This can take a few moments, so please be patient![/yellow]"
+        f"The AI is working on your summary. This can take a few moments, so please be patient!"
     )
 
     # Get and print response
     response = ai_client.generate_response(prompt)
-    print(f"AI Summary: {response}")
+    print(f"[cyan]AI Summary:[/cyan] [green]{response}[/green]")
 
     # Clear history immediately, as each response should be generated freshly.
     ai_client.clear_history()
