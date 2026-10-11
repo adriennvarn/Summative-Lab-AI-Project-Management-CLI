@@ -49,7 +49,7 @@ def find_user(name):
     Raises:
         ValueError: If no user by that name exists"""
 
-    user = next((user for user in db if user.name == name), None)
+    user = next((user for user in db if user.name.lower() == name.lower()), None)
     if not user:
         msg = f"No user named {name} exists."
         logger.info(msg)
@@ -69,7 +69,7 @@ def find_project(name, title):
 
     user = find_user(name)
     project = next(
-        (project for project in user.projects if project.title == title), None
+        (project for project in user.projects if project.title.lower() == title.lower()), None
     )
     if not project:
         msg = f"User {user.name} does not have a project named {title}."
@@ -92,7 +92,7 @@ def find_task(project, title):
     if not type(project).__name__ == "Project":
         raise TypeError(f"find_task expected type Project but received {type(project)}")
 
-    task = next((task for task in project.tasks if task.title == title), None)
+    task = next((task for task in project.tasks if task.title.lower() == title.lower()), None)
     if not task:
         msg = f"Project {project.title} does not have a task named {title}."
         logger.info(msg)
