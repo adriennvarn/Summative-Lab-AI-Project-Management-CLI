@@ -13,32 +13,6 @@ import argparse
 import src.parser_functions as pf
 import traceback
 
-"""
-cmds:
-    -n, --name
-    -e, --email
-    -u, --user
-    -t, --title
-    -d, --description
-    -p, --project
-
-    add-user --name --email
-    update-user --name               brings up interactive, update name and/or email
-    remove-user --name
-    view-users
-    
-    add-project --user --title       brings up interactive inputs to add description and due date
-    update-project --user --title    brings up interactive inputs to update
-    remove-project --title
-    view-projects [--user]
-    
-    add-task --project --title
-    update-task --project --title    brings up interactive
-    remove-task --project --title
-    view-tasks --project
-    
-    summarize-project --project    
-"""
 # =========================== Globals ============================== #
 
 """File level logger object"""
@@ -63,8 +37,6 @@ status_names = ("-s", "--status")
 status_config = {"help": "Status of task."}
 assigned_to_names = ("-a", "--assigned_to")
 assigned_to_config = {"help": "User the task is assigned to."}
-
-
 
 
 # =========================== Main ============================== #
